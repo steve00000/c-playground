@@ -1,4 +1,12 @@
 // [FM] Tutti i commenti che cominciano per [FM] sono delle indicazioni di stile, vanno rimossi dal programma finale
+// [FM]
+// [FM] Un modo semplice per rimuovere i miei commenti di stile e' eseguire il seguente comando da shell:
+// [FM] grep -v "\[FM\]" fab_proiettili.c > fab_proiettili_clean.c
+// [FM] Il comando grep serve a filtrare un file selezionando le righe che contengono un certo pattern.
+// [FM] L'opzione -v inverte la selezione e quindi toglie tutte le righe che contengono [FM] lasciando le altre.
+// [FM] L'operatore > serve a redirezionare l'uscita del comando grep (in questo caso le righe di fab_proiettili.c)
+// [FM] che non hanno questi commenti di stile in un nuovo file.
+// [FM]
 // [FM] All'inizio di ogni file metti un commento che spiega cosa fa il file.
 // [FM] Opzionalmente e' una buona idea mettere data e autore (ci sono degli standard, non ce li ho freschi per il
 // [FM] C, saranno oggetto di una prossima lezione)
@@ -11,6 +19,15 @@
  */
 
 #include <stdio.h>
+
+// [FM] Questo comando del preprocessore serve definisce una sorta di variabile
+// [FM] La variabile viene utilizzata nel codice per includere o meno delle stampe di debug nella compilazione
+// [FM] Cancellando o commentando questa riga e' possibile "accendere" o "spegnere" le stampe di debug.
+// [FM] Se si cancella la riga, e' comunque possibile definire la variabile a tempo di compilazione passando
+// [FM] l'opzione -D al compilatore.
+// [FM] In altre parole si puo' cancellare questa riga (disabilitando il debug) e abilitare il debug con il comando:
+// [FM] gcc -DF_DEBUG_MESSAGE -o fab_proiettili fab_proiettili.c
+#define F_DEBUG_MESSAGE
 
 // [FM] Dove sono le mie variabili? Se dichiari le variabili qui le rendi globali, questo significa che vengono viste
 // [FM] da tutte le funzioni: questo e' male per l'incapsulamento e il riuso del codice - a voce i dettagli
@@ -72,7 +89,9 @@ double calcola_traiettoria(double velocita_iniziale_x_1, double velocita_inizial
     // [FM] possibile fonte di errori
     const double time_step = 0.001;
 
+#ifdef F_DEBUG_MESSAGE
     printf("\n\n***** BANG *****\n\n\n");
+#endif
 
     do {
         x = velocita_iniziale_x_1 * time;
@@ -83,7 +102,11 @@ double calcola_traiettoria(double velocita_iniziale_x_1, double velocita_inizial
 
         // [FM] stampa l'output in maniera ordinata in modo che, per esempio, possa essere letto da un'altro
         // [FM] programma, per esempio per graficare il risultato
+        // [FM] Con queste direttive di preprocessore posso includere/escludere dalla compilazione l'istruzione di
+        // [FM] print, questo mi consente di stampare solo il risultato finale e non tutti i risultati intermedi.
+#ifdef F_DEBUG_MESSAGE
         printf("t=%lf, x=%lf, y=%lf\n", time, x, y);
+#endif
     } while (y >= 0);
 
     return x;
@@ -96,44 +119,6 @@ int main() {
     double velocita_iniziale_y_1 = leggi_velocita("Inserire la velocita' del primo proiettile sull'asse delle y in metri al secondo.....");
     double velocita_iniziale_x_2 = leggi_velocita("Inserire la velocita' del secondo proiettile sull'asse delle x in metri al secondo...");
     double velocita_iniziale_y_2 = leggi_velocita("Inserire la velocita' del secondo proiettile sull'asse delle y in metri al secondo...");
-    
-/*
-    //inizio velocita' del proiettile_1
-
-    do {
-        printf("Inserire la velocita' del primo proiettile sull'asse delle x in metri al secondo.....");
-        scanf("%lf", &velocita_iniziale_x_1);
-        if (velocita_iniziale_x_1 < 0) {
-            printf("La velocita' non deve essere negativa\n");
-        }
-    } while (velocita_iniziale_x_1 < 0);
-
-    do {
-        printf("Inserire la velocita' del primo proiettile sull'asse delle y in metri al secondo.....");
-        scanf("%lf", &velocita_iniziale_y_1);
-        if (velocita_iniziale_y_1 < 0) {
-            printf("La velocita' non deve essere negativa\n");
-        }
-    } while (velocita_iniziale_y_1 < 0);
-
-    //inizio velocita' del proiettile_2
-
-    do {
-        printf("Inserire la velocita' del secondo proiettile sull'asse delle x in metri al secondo...");
-        scanf("%lf", &velocita_iniziale_x_2);
-        if (velocita_iniziale_x_2 < 0) {
-            printf("La velocita' non deve essere negativa\n");
-        }
-    } while (velocita_iniziale_x_2 < 0);
-
-    do {
-        printf("Inserire la velocita' del secondo proiettile sull'asse delle y in metri al secondo...");
-        scanf("%lf", &velocita_iniziale_y_2);
-        if (velocita_iniziale_y_2 < 0) {
-            printf("La velocita' non deve essere negativa\n");
-        }
-    } while (velocita_iniziale_y_2 < 0);
-*/
 
     //inizio fase dei calcoli
 
@@ -144,30 +129,4 @@ int main() {
 
     distanza = calcola_traiettoria(velocita_iniziale_x_2, velocita_iniziale_y_2);
     printf("Il second proiettile arriva a %lf metri di distanza\n", distanza);
-
-    /*time = 0;
-
-
-    printf("\n\n***** BANG *****\n\n\n");
-
-    do {
-        x = velocita_iniziale_x_1 * time;
-        y = velocita_iniziale_y_1 * time - 0.5 * EARTH_GRAVITY_ACCELLERATION * time * time;
-        // [FM] in alternativa, puoi usare l'operatore di autoincremento
-        // [FM] time = time + time_step;
-        printf("x=%lf\n  y=%lf\n\n", x, y);
-    } while (y >= 0);
-    printf("Il primo proiettile arriva a %lf metri di distanza\n", x);
-
-    time = 0;
-
-    printf("\n\n***** BANG *****\n\n\n");
-
-    do {
-        x2 = velocita_iniziale_x_2 * time;
-        y2 = velocita_iniziale_y_2 * time - 0.5 * EARTH_GRAVITY_ACCELLERATION * time * time;
-
-        time = time + time_step;
-    } while (y2 >= 0);
-    printf("Il secondo proiettile arriva a %lf metri di distanza\n", x);*/
 }
